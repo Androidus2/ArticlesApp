@@ -1,0 +1,13 @@
+﻿@model ArticlesApp.Models.Category
+
+<h2 class="mb-4">Adauga Categorie Noua</h2>
+
+<form asp-action="New" method="post">
+    <div class="form-group">
+        <label asp-for="CategoryName" class="form-label">Nume categorie</label>
+        <input asp-for="CategoryName" class="form-control"/>
+        <span asp-validation-for="CategoryName" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Salveaza</button>
+    <a class="btn btn-secondary mt-3" href="/Categories">Inapoi la Lista Categorii</a>
+</form>

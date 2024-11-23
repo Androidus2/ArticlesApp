@@ -1,0 +1,36 @@
+﻿@model ArticlesApp.Models.Category
+
+<h2 class="mb-4">Detalii Categorie</h2>
+
+<dl class="row">
+    <dt class="col-sm-2">Nume</dt>
+    <dd class="col-sm-10">@Model.CategoryName</dd>
+</dl>
+
+<div class="mb-4">
+    <a class="btn btn-warning" href="/Categories/Edit/@Model.Id">Editeaza</a>
+    <a class="btn btn-danger" href="/Categories/Delete/@Model.Id">Sterge</a>
+    <a class="btn btn-secondary" href="/Categories">Inapoi la Lista Categorii</a>
+</div>
+
+<h3 class="mb-4">Articole in aceasta Categorie</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Titlu Articol</th>
+            <th>Actiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var article in Model.Articles)
+
+        {
+            <tr>
+                <td>@article.Title</td>
+                <td>
+                    <a class="btn btn-info btn-sm" href="/Articles/Show/@article.Id">Vizualizeaza</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

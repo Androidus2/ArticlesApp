@@ -1,0 +1,175 @@
+﻿@model ArticlesApp.Models.Article
+
+<h2>Afisare articol</h2>
+<br />
+<a class="btn btn-primary" href="/Articles/Edit/@Model.Id">Editare articol</a>
+<a class="btn btn-danger" href="/Articles/Delete/@Model.Id">Stergere articol</a>
+<br />
+<br />
+<div class="card">
+    <partial name="ArticleInfo" model="Model" />
+</div>
+<br />
+
+<div class="card">
+    <div class="card-body">
+        <button class="btn btn-primary" onclick="toggleNewCommentForm()" id="newCommentButton">Adauga comentariu</button>
+        <div id="newCommentForm" style="display:none;">
+            <form method="post" asp-controller="Articles" asp-action="AddComment">
+                <input type="hidden" name="ArticleId" value="@Model.Id" />
+                <div class="form-group">
+                    <label for="Content">Comentariu</label>
+                    <textarea class="form-control" name="Content" id="Content" rows="5" style="resize: none"></textarea>
+                    @if(TempData["ShowNewComment"] != null){
+                        <span asp-validation-for="Content" class="text-danger"></span>
+                    }
+                </div>
+                <br />
+                <button type="submit" class="btn btn-primary">Salveaza</button>
+                <button type="button" class="btn btn-secondary" onclick="toggleNewCommentForm()">Anuleaza</button>
+            </form>
+        </div>
+
+        <hr />
+        <br />
+
+        <h3 class="card-title">Comentarii: @Enumerable.Count(Model.Comments)</h3>
+        <br />
+        @foreach (var comment in Model.Comments)
+        {
+            <div class="card">
+                <div class="card-body">
+                    <div id="editForm-@comment.Id" style="display:none;">
+                        <form method="post" asp-controller="Articles" asp-action="EditComment">
+                            <input type="hidden" name="Id" value="@comment.Id" />
+                            <input type="hidden" name="ArticleId" value="@Model.Id" />
+                            <div class="form-group">
+                                <h5 for="Content">Editare comentariu</h5>
+                                @if (TempData["ShowEditComment"] != null && comment.Id == (int)TempData["ShowEditComment"])
+                                {
+                                    <textarea class="form-control" name="Content" id="Content" rows="3" style="resize: none">@TempData["LastCommentContent"]</textarea>
+                                    <span asp-validation-for="Content" class="text-danger"></span>
+                                }
+                                else
+                                {
+                                    <textarea class="form-control" name="Content" id="Content" rows="3" style="resize: none">@comment.Content</textarea>
+                                }
+                            </div>
+                            <br />
+                            <button type="submit" class="btn btn-primary">Salveaza</button>
+                            <button type="button" class="btn btn-secondary" onclick="toggleEditForm(@comment.Id)">Anuleaza</button>
+                        </form>
+                    </div>
+
+                    <div id="commentContent-@comment.Id">
+                        <div class="card-text">
+                            @comment.Content
+                        </div>
+
+                        <div class="d-flex justify-content-between flex-row mt-5">
+                            <div>
+                                <i class="bi bi-person"> @* @comment.Author *@ -Unknown user </i>
+                            </div>
+                            <span class="px-1 align-content-center">
+                                @comment.Date
+                            </span>
+                        </div>
+
+                        <br />
+
+                        <a class="btn btn-danger" href="/Comments/Delete/@comment.Id">Stergere comentariu</a>
+                        <button class="btn btn-secondary" onclick="toggleEditForm(@comment.Id)">Editare comentariu</button>
+                    </div>
+
+                    @if (TempData["ShowEditComment"] != null && comment.Id == (int)TempData["ShowEditComment"])
+					{
+						<text>
+							<script>
+                                function toggleEditForm(commentId) {
+                                    var editForm = document.getElementById('editForm-' + commentId);
+                                    var commentContent = document.getElementById('commentContent-' + commentId);
+                                    if (editForm.style.display === 'none') {
+                                        editForm.style.display = 'block';
+                                        commentContent.style.display = 'none';
+                                    }
+                                    else {
+                                        editForm.style.display = 'none';
+                                        commentContent.style.display = 'block';
+                                    }
+                                }
+
+                                toggleEditForm(@TempData["ShowEditComment"]);
+
+							</script>
+						</text>
+					}
+                </div>
+            </div>
+            <br />
+        }
+
+    </div>
+</div>
+
+<br />
+<a class="btn btn-success" href="/">Afisare articole</a>
+
+<script>
+    function toggleEditForm(commentId) {
+        var editForm = document.getElementById('editForm-' + commentId);
+        var commentContent = document.getElementById('commentContent-' + commentId);
+        if (editForm.style.display === 'none') {
+            editForm.style.display = 'block';
+            commentContent.style.display = 'none';
+        }
+        else {
+            editForm.style.display = 'none';
+            commentContent.style.display = 'block';
+        }
+    }
+
+    function toggleNewCommentForm() {
+        var newCommentForm = document.getElementById('newCommentForm');
+        var newCommentButton = document.getElementById('newCommentButton');
+        if (newCommentForm.style.display === 'none') {
+            newCommentForm.style.display = 'block';
+            newCommentButton.style.display = 'none';
+        }
+        else {
+            newCommentForm.style.display = 'none';
+            newCommentButton.style.display = 'block';
+        }
+    }
+
+    window.onload = function () {
+		console.log("Loaded");
+		console.log(document.getElementById('editForm-' + 21));
+		console.log(document.getElementById('commentContent-' + 21));
+
+        @if (TempData["ShowEditComment"] != null)
+        {
+            <text>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            toggleEditForm(@TempData["ShowEditComment"]);
+                                });
+            </text>
+        }
+	}
+
+    @if (TempData["ShowNewComment"] != null)
+    {
+        <text>
+                document.addEventListener('DOMContentLoaded', function() {
+                    toggleNewCommentForm();
+                                        });
+        </text>
+    }
+
+    
+    
+
+   
+
+</script>
+
+

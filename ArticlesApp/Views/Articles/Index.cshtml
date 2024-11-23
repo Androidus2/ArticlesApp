@@ -1,0 +1,11 @@
+﻿<h2 class="text-center">Afisare articole</h2>
+<br />
+@foreach (var article in ViewBag.Articles)
+{
+	<div class="card">
+		<partial name="ArticleInfo" model=article />
+		<a class="btn btn-success" href="/Articles/Show/@article.Id">Afisare articol</a>
+	</div>
+	<br />
+	<br />
+}

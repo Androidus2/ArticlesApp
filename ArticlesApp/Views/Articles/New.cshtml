@@ -1,0 +1,26 @@
+﻿@model ArticlesApp.Models.Article
+
+<h2 class="mb-4">Formular adaugare articol</h2>
+<form asp-action="New" method="post">
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label">Titlu</label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Content" class="form-label">Continut</label>
+        <textarea asp-for="Content" class="form-control" rows="15" style="resize: none"></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label">Categorie</label>
+        <select asp-for="CategoryId" class="form-select">
+            @foreach (var cat in Model.Categ)
+            {
+                <option value="@cat.Value">@cat.Text</option>
+            }
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+    <button class="btn btn-outline-success" type="submit">Adauga articol</button>
+</form>

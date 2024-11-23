@@ -1,0 +1,24 @@
+﻿<h2 class="mb-4">Lista Categorii</h2>
+<a class="btn btn-primary mb-3" href="/Categories/New">Adauga Categorie Noua</a>
+<a class="btn btn-secondary mb-3" href="/">Inapoi la Lista Articole</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nume Categorie</th>
+            <th>Actiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cat in ViewBag.Categories)
+        {
+            <tr>
+                <td>@cat.CategoryName</td>
+                <td>
+                    <a class="btn btn-info btn-sm" href="/Categories/Show/@cat.Id">Vizualizeaza</a>
+                    <a class="btn btn-warning btn-sm" href="/Categories/Edit/@cat.Id">Editeaza</a>
+                    <a class="btn btn-danger btn-sm" href="/Categories/Delete/@cat.Id">Sterge</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,14 @@
+﻿<div class="card-body">
+	<h3 class="card-title alert-success py-3 px-3 rounded-2">@Model.Title</h3>
+	<div class="card-text">
+		@Model.Content
+	</div>
+	<div class="d-flex justify-content-between flex-row mt-5">
+		<div>
+			<a href="/Categories/Show/@Model.CategoryId"><i class="bi bi-globe"> @Model.Category.CategoryName </i></a>
+		</div>
+		<span class="alert-success px-1 align-content-center">
+			@Model.Date
+		</span>
+	</div>
+</div>
