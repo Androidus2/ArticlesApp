@@ -12,8 +12,14 @@ namespace ArticlesApp.Models
 
         public DateTime Date { get; set; }
 
+        // FK, un comentariu apartine unui articol
         public int? ArticleId { get; set; }
 
         public virtual Article? Article { get; set; }
+
+        // FK, un comentariu apartine unui utilizator
+        public string? UserId { get; set; }
+
+        public virtual ApplicationUser? User { get; set; }
     }
 }

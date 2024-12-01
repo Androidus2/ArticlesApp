@@ -1,5 +1,7 @@
 ﻿using ArticlesApp.Data;
 using ArticlesApp.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,13 +11,17 @@ namespace ArticlesApp.Controllers
 	public class ArticlesController : Controller
 	{
 		private readonly ApplicationDbContext db;
+		private readonly UserManager<ApplicationUser> _userManager;
+		private readonly RoleManager<IdentityRole> _roleManager;
 
-		public ArticlesController(ApplicationDbContext db)
-		{
-			this.db = db;
-		}
+        public ArticlesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        {
+            db = context;
+            _userManager = userManager;
+            _roleManager = roleManager;
+        }
 
-		public IEnumerable<SelectListItem> GetAllCategories()
+        public IEnumerable<SelectListItem> GetAllCategories()
 		{
 			var selectList = new List<SelectListItem>();
 			var categories = db.Categories.ToList();
@@ -30,28 +36,46 @@ namespace ArticlesApp.Controllers
 			return selectList;
 		}
 
+		[Authorize(Roles = "User,Editor,Admin")]
 		public IActionResult Index()
 		{
-			var articles = db.Articles.Include(art => art.Category).ToList();
-			ViewBag.Articles = articles;
+            var articles = db.Articles
+                            .Include("Category")
+                            .Include("User")
+                            .ToList();
+            ViewBag.Articles = articles;
+
 			return View();
 		}
 
 
 		[HttpGet]
-		public IActionResult Show(int id)
+		[Authorize(Roles = "User,Editor,Admin")]
+        public IActionResult Show(int id)
 		{
 			var article = db.Articles
-							.Include(art => art.Category)
-							.Include(art => art.Comments)
+							.Include("Category")
+							.Include("Comments")
+							.Include("User")
+							.Include("Comments.User")
                             .FirstOrDefault(art => art.Id == id);
 
+            if (article == null)
+			{
+                TempData["error"] = "Articolul nu exista!";
+                return RedirectToAction("Index");
+            }
+
+			ViewBag.CurrentUserId = _userManager.GetUserId(User);
+            SetAccessRights(article.UserId);
+			
 			return View(article);
 		}
 
 
 		[HttpGet]
-		public IActionResult New()
+        [Authorize(Roles = "Editor,Admin")]
+        public IActionResult New()
 		{
 			try
 			{
@@ -66,11 +90,14 @@ namespace ArticlesApp.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult New(Article article)
+        [Authorize(Roles = "Editor,Admin")]
+        public IActionResult New(Article article)
 		{
             article.Date = DateTime.Now;
 
-			if (ModelState.IsValid)
+			article.UserId = _userManager.GetUserId(User);
+
+            if (ModelState.IsValid)
 			{
                 db.Articles.Add(article);
                 db.SaveChanges();
@@ -83,12 +110,20 @@ namespace ArticlesApp.Controllers
         }
 
 		[HttpGet]
-		public IActionResult Edit(int id)
+        [Authorize(Roles = "Editor,Admin")]
+        public IActionResult Edit(int id)
 		{
 			try
 			{
 				var article = db.Articles.Find(id);
-				article.Categ = GetAllCategories();
+
+				if(article.UserId != _userManager.GetUserId(User) && !User.IsInRole("Admin"))
+                {
+                    TempData["error"] = "Nu aveti dreptul sa editati acest articol!";
+                    return RedirectToAction("Index");
+                }
+
+                article.Categ = GetAllCategories();
 				return View(article);
 			}
 			catch (Exception)
@@ -98,12 +133,20 @@ namespace ArticlesApp.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult Edit(int id, Article requestArticle)
+        [Authorize(Roles = "Editor,Admin")]
+        public IActionResult Edit(int id, Article requestArticle)
 		{
 
             if (ModelState.IsValid)
             {
                 var article = db.Articles.Find(id);
+
+                if (article.UserId != _userManager.GetUserId(User) && !User.IsInRole("Admin"))
+                {
+                    TempData["error"] = "Nu aveti dreptul sa editati acest articol!";
+                    return RedirectToAction("Index");
+                }
+
                 article.Title = requestArticle.Title;
                 article.Content = requestArticle.Content;
                 article.CategoryId = requestArticle.CategoryId;
@@ -118,6 +161,7 @@ namespace ArticlesApp.Controllers
         }
 
 		[HttpGet]
+		[Authorize(Roles = "Editor,Admin")]
 		public IActionResult Delete(int id)
 		{
 			try
@@ -125,7 +169,14 @@ namespace ArticlesApp.Controllers
 				var article = db.Articles.Find(id);
 				if (article != null)
 				{
-					var comments = from com in db.Comments
+
+					if(article.UserId != _userManager.GetUserId(User) && !User.IsInRole("Admin"))
+                    {
+                        TempData["error"] = "Nu aveti dreptul sa stergeti acest articol!";
+                        return RedirectToAction("Index");
+                    }
+
+                    var comments = from com in db.Comments
 								   where com.ArticleId == article.Id
 								   select com;
 					foreach (var comment in comments)
@@ -148,10 +199,12 @@ namespace ArticlesApp.Controllers
 
 
 		[HttpPost]
+		[Authorize(Roles = "User,Editor,Admin")]
 		public IActionResult AddComment([FromForm] Comment comment)
 		{
 			comment.Date = DateTime.Now;
-			if (ModelState.IsValid)
+            comment.UserId = _userManager.GetUserId(User);
+            if (ModelState.IsValid)
 			{
 				db.Comments.Add(comment);
 				db.SaveChanges();
@@ -173,11 +226,19 @@ namespace ArticlesApp.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult EditComment([FromForm] Comment comment)
+        [Authorize(Roles = "User,Editor,Admin")]
+        public IActionResult EditComment([FromForm] Comment comment)
         {
 			comment.Date = DateTime.Now;
             if (ModelState.IsValid)
             {
+
+				if(comment.UserId != _userManager.GetUserId(User) && !User.IsInRole("Admin"))
+                {
+                    TempData["error"] = "Nu aveti dreptul sa editati acest comentariu!";
+                    return RedirectToAction("Index");
+                }
+
                 db.Comments.Update(comment);
                 db.SaveChanges();
 				TempData["message"] = "Comentariul a fost modificat!";
@@ -196,6 +257,11 @@ namespace ArticlesApp.Controllers
                 TempData["error"] = "Comentariul nu a putut fi modificat!";
                 return View("Show", art);
             }
+        }
+
+		private void SetAccessRights(string checkForId)
+		{
+			ViewBag.ShowButtons = User.IsInRole("Admin") || checkForId == _userManager.GetUserId(User);
         }
     }
 }

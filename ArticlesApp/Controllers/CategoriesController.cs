@@ -1,5 +1,7 @@
 ﻿using ArticlesApp.Data;
 using ArticlesApp.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,12 +11,17 @@ namespace ArticlesApp.Controllers
     {
 
         private readonly ApplicationDbContext db;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public CategoriesController(ApplicationDbContext db)
+        public CategoriesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            this.db = db;
+            db = context;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Index()
         {
             var categories = from cat in db.Categories
@@ -24,6 +31,7 @@ namespace ArticlesApp.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles= "Admin")]
         public IActionResult Show(int id)
         {
             var category = db.Categories.
@@ -34,6 +42,7 @@ namespace ArticlesApp.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id)
         {
             var category = db.Categories.Find(id);
@@ -41,6 +50,7 @@ namespace ArticlesApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id, Category category)
         {
             try
@@ -68,6 +78,7 @@ namespace ArticlesApp.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult New()
         {
             Category category = new Category();
@@ -75,6 +86,7 @@ namespace ArticlesApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult New(Category category)
         {
             try
@@ -97,6 +109,7 @@ namespace ArticlesApp.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
             try

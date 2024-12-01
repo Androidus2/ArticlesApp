@@ -21,9 +21,15 @@ namespace ArticlesApp.Models
         public DateTime Date { get; set; }
 
         [Required(ErrorMessage = "Categoria nu poate fi goala!")]
+        // FK, un aritcol apartine unei categorii
         public int CategoryId { get; set; }
 
         public virtual Category? Category { get; set; }
+
+        // FK, un articol apartine unui utilizator
+        public string? UserId { get; set; }
+
+        public virtual ApplicationUser? User { get; set; }
 
         public virtual ICollection<Comment>? Comments { get; set; }
 

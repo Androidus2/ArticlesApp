@@ -2,8 +2,10 @@
 
 <h2>Afisare articol</h2>
 <br />
-<a class="btn btn-primary" href="/Articles/Edit/@Model.Id">Editare articol</a>
-<a class="btn btn-danger" href="/Articles/Delete/@Model.Id">Stergere articol</a>
+@if(ViewBag.ShowButtons){
+    <a class="btn btn-primary" href="/Articles/Edit/@Model.Id">Editare articol</a>
+    <a class="btn btn-danger" href="/Articles/Delete/@Model.Id">Stergere articol</a>
+}
 <br />
 <br />
 <div class="card">
@@ -68,7 +70,7 @@
 
                         <div class="d-flex justify-content-between flex-row mt-5">
                             <div>
-                                <i class="bi bi-person"> @* @comment.Author *@ -Unknown user </i>
+                                <i class="bi bi-person"> @comment.User.UserName </i>
                             </div>
                             <span class="px-1 align-content-center">
                                 @comment.Date
@@ -77,8 +79,11 @@
 
                         <br />
 
-                        <a class="btn btn-danger" href="/Comments/Delete/@comment.Id">Stergere comentariu</a>
-                        <button class="btn btn-secondary" onclick="toggleEditForm(@comment.Id)">Editare comentariu</button>
+                        @if (User.IsInRole("Admin") || comment.UserId == ViewBag.CurrentUserId)
+                        {
+                            <a class="btn btn-danger" href="/Comments/Delete/@comment.Id">Stergere comentariu</a>
+                            <button class="btn btn-secondary" onclick="toggleEditForm(@comment.Id)">Editare comentariu</button>
+                        }
                     </div>
 
                     @if (TempData["ShowEditComment"] != null && comment.Id == (int)TempData["ShowEditComment"])
@@ -110,9 +115,6 @@
 
     </div>
 </div>
-
-<br />
-<a class="btn btn-success" href="/">Afisare articole</a>
 
 <script>
     function toggleEditForm(commentId) {

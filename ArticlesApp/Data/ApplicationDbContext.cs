@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ArticlesApp.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Article> Articles { get; set; }
         public DbSet<Category> Categories { get; set; }
