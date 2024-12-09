@@ -1,0 +1,18 @@
+﻿<div class="card-body">
+	<h3 class="card-title alert-success py-3 px-3 rounded-2">@Model.Name</h3>
+	<div class="d-flex justify-content-between flex-row mt-5">
+		<div>
+			<a href="/Bookmarks/Show/@Model.Id"><i class="bi bi-globe"> Afiseaza </i></a>
+		</div>
+
+		<div><i class="bi bi-person">@Model.User.UserName</i></div>
+
+		<div>
+			<a href="/Bookmarks/Edit/@Model.Id"><i class="bi bi-globe"> Editeaza </i></a>
+		</div>
+
+		<div>
+			<a href="/Bookmarks/Delete/@Model.Id"><i class="bi bi-globe"> Sterge </i></a>
+		</div>
+	</div>
+</div>

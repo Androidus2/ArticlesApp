@@ -33,6 +33,8 @@ namespace ArticlesApp.Models
 
         public virtual ICollection<Comment>? Comments { get; set; }
 
+        public virtual ICollection<ArticleBookmark>? ArticleBookmarks { get; set; }
+
         [NotMapped]
 		public IEnumerable<SelectListItem>? Categ { get; set; }
 	}

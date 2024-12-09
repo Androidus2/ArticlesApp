@@ -8,6 +8,28 @@
 }
 <br />
 <br />
+
+<form method="post" asp-controller="Articles" asp-action="AddBookmark">
+    <input type="hidden" name="ArticleId" value="@Model.Id" />
+    <div class="d-flex flex-row justify-content-center p-3 border-1 border-top">
+        <div>
+            <select name="BookmarkId" class="form-control">
+                <option selected>Adauga acest articol intr-o colectie</option>
+                @foreach (var bookmark in ViewBag.Bookmarks)
+                {
+                    <option value="@bookmark.Id">@bookmark.Name</option>
+                }
+            </select>
+        </div>
+        <div>
+            <input type="submit" class="btn btn-success alert-success" value="+" />
+        </div>
+    </div>
+</form>
+
+<br />
+<br />
+
 <div class="card">
     <partial name="ArticleInfo" model="Model" />
 </div>
@@ -167,10 +189,6 @@
         </text>
     }
 
-    
-    
-
-   
 
 </script>
 
